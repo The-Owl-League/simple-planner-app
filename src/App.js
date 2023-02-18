@@ -4,27 +4,74 @@ import { Component } from "react";
 import {useCookies, withCookies} from 'react-cookie'
 
 
-function AppHeader () {
-    return (
-        <header className="App-header">
-            <div className="header-container">
-                <div className="header-element">
-                    Главная
-                </div>
-                <div className="header-element">
-                    Проекты
-                </div>
-                <div className="header-element selected">
-                    Задачи
-                </div>
-            </div>
-        </header>
-    )
-}
+const Page =  {MAIN: 'main', TASKS: 'tasks', PROJECT: 'projects'}
 
 
-function fmtDate(date) {
+class PageControllerComponent extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {page: Page.MAIN,
+                      user_id: props.user_id}
+    }
 
+    onClickTriggerFactory(page) {
+        return () => {
+            this.setState({page: page})
+        }
+    }
+
+    render() {
+        let [task_class, main_class, project_class] = [
+            "header-element",
+            "header-element",
+            "header-element"
+        ];
+        function ChooseContent() {
+            switch (this.state.page) {
+                case Page.MAIN:
+                    return <MainPage/>
+                case Page.PROJECT:
+                    return <ProjectsPage/>
+                case Page.TASKS:
+                    return <TasksPage user_id={this.state.user_id}/>
+                default:
+                    return <span>Page not found error</span>
+            }
+        }
+        ChooseContent = ChooseContent.bind(this)
+
+        switch (this.state.page) {
+            case Page.MAIN:
+                main_class += " selected"
+                break
+            case Page.PROJECT:
+                project_class += " selected"
+                break
+            case Page.TASKS:
+                task_class += ' selected'
+                break
+            default:
+                return <span>Page not found error</span>
+        }
+
+        return [
+
+            <header className="App-header">
+                <div className="header-container">
+                    <div className={main_class} onClick={this.onClickTriggerFactory(Page.MAIN)}>
+                        Главная
+                    </div>
+                    <div className={project_class} onClick={this.onClickTriggerFactory(Page.PROJECT)}>
+                        Проекты
+                    </div>
+                    <div className={task_class} onClick={this.onClickTriggerFactory(Page.TASKS)}>
+                        Задачи
+                    </div>
+                </div>
+            </header>,
+            <ChooseContent/>
+        ]
+    }
 }
 
 class TasksListComponent extends Component {
@@ -119,6 +166,23 @@ function TasksPage(props) {
     );
 }
 
+function MainPage(props) {
+    return (
+        <div>
+            Main page
+        </div>
+    )
+}
+
+
+function ProjectsPage(props) {
+    return (
+        <div>
+            Projects page
+        </div>
+    )
+}
+
 
 function App() {
     const [cookies, setCookie] = useCookies(['user_id'])
@@ -126,8 +190,7 @@ function App() {
 
     return (
     <div className="App">
-        <AppHeader />
-        <TasksPage user_id={cookies.user_id} />
+        <PageControllerComponent user_id={cookies.user_id}/>
     </div>
   );
 }
