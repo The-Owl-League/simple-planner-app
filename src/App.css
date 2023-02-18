@@ -2,37 +2,70 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.header-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: baseline;
+  background-color: #c2c2c2;
+  padding: 10px;
+}
+
+.header-element {
+  cursor: default;
+}
+
+.header-element.selected {
+  font-weight: bold;
+}
+
+.header-element:hover {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.task-list {
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.task-item {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  padding: 0.5em 0.7em;
+  margin: 1em;
+  font-size: 17px;
+  border: black solid 1px;
+  border-radius: 15px;
 }
+
+
+.task-item>div {
+  display: flex;
+  margin-bottom: 3%;
+
+}
+
+.edit-icon {
+  padding: 0 10px;
+  width: 19px;
+  height: 19px;
+}
+
+.task-header {
+
+  font-size: 18px;
+
+}
+
+.task-body {
+  text-align: left;
+}
+
+.task-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+
