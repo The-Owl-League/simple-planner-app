@@ -1,0 +1,30 @@
+*
+{
+    margin:0;
+    padding: 0;
+}
+
+.RegBlock
+{
+    padding-top: 40px;
+    text-align: center;
+}
+
+.main
+{
+    max-width: 428;
+    max-height: 926;
+}
+
+.reg
+{
+    display: flex;
+    justify-content: center;
+}
+.Url
+{
+    display: flex;
+    text-decoration: none;
+    justify-content: center;
+    color: blue;
+}

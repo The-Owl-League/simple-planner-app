@@ -1,14 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
+import './login_style.css';
 import { Component, useState } from "react";
-import {useCookies, withCookies} from 'react-cookie'
+import { useCookies, withCookies } from 'react-cookie'
 
 
 const Page =  {
     MAIN: 'main',
     TASKS: 'tasks',
     PROJECT: 'projects',
-    ADD_TASK: 'add_task'
+    ADD_TASK: 'add_task',
+    REGISTRATION: 'registration',
+    FORGOT_PASSWORD: 'forgot_password',
+    LOG_IN: 'log_in'
 }
 
 
@@ -16,11 +20,24 @@ class PageControllerComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            page: Page.MAIN,
-            prev_page: Page.MAIN,
-            user_id: props.user_id
+            page: Page.REGISTRATION,  // default page
+            prev_page: Page.REGISTRATION,
+            user_id: props.user_id,
+            cookies: props.cookies
         }
         this.onClickTriggerFactory = this.onClickTriggerFactory.bind(this)
+        this.changeUser = this.changeUser.bind(this)
+        this.getUser = this.getUser.bind(this)
+    }
+
+    changeUser(new_user_id) {
+        console.log("new user" + new_user_id)
+        this.setState({
+            user_id: new_user_id
+        })
+    }
+    getUser() {
+        return this.state.user_id
     }
 
     onClickTriggerFactory(page) {
@@ -46,7 +63,7 @@ class PageControllerComponent extends Component {
                 case Page.PROJECT:
                     return <ProjectsPage/>
                 case Page.TASKS:
-                    return <TasksPage user_id={this.state.user_id} changePageFactory={this.onClickTriggerFactory}/>
+                    return <TasksPage user_id={this.state.user_id} changePageFactory={this.onClickTriggerFactory} cookies={this.state.cookies} getUser={this.getUser}/>
                 case Page.ADD_TASK:
                     const callbackUndo = this.onClickTriggerFactory(this.state.prev_page);
 
@@ -54,6 +71,13 @@ class PageControllerComponent extends Component {
                         user_id={this.state.user_id}
                         callbackUndo={callbackUndo}
                     />
+                case Page.REGISTRATION:
+                    console.log('ok')
+                    return <RegistrationPage changePageFactory={this.onClickTriggerFactory} changeUser={this.changeUser}/>
+                case Page.FORGOT_PASSWORD:
+                    return <ForgotPasswordPage changePageFactory={this.onClickTriggerFactory}/>
+                case Page.LOG_IN:
+                    return <LoginPage changePageFactory={this.onClickTriggerFactory}/>
                 default:
                     return <span>Page not found error</span>
             }
@@ -107,7 +131,7 @@ function AddTaskPage(props) {
 
     const onSubmit = (e) => {
         const request1 = new XMLHttpRequest();
-        request1.open('POST', `http://127.0.0.1:8000/v1/tasks/?user_id=${props.user_id}`, true, );
+        request1.open('POST', `http://185.104.248.207:6079/v1/tasks/?user_id=${props.user_id}`, true, );
         request1.responseType = 'json'
         request1.onload = () => {}
         const blob = new Blob([JSON.stringify({
@@ -234,14 +258,16 @@ class TasksPage extends Component {
             TimerID: null,
             user_id: props.user_id,
             project_id: props.project_id,
-            status: props.status
+            status: props.status,
+            cookies: props.cookies,
+            getUser: props.getUser
         }
 
     }
 
     updateContentRequest(user_id) {
         const request1 = new XMLHttpRequest();
-        request1.open('GET', `http://127.0.0.1:8000/v1/tasks?user_id=${user_id}&status=NEW`, true, );
+        request1.open('GET', `http://185.104.248.207:6079/v1/tasks?user_id=${user_id}&status=NEW`, true, );
         request1.responseType = 'json'
         request1.onload = () => {
             this.setState({
@@ -251,7 +277,7 @@ class TasksPage extends Component {
         request1.send(null);
 
         const request2 = new XMLHttpRequest();
-        request2.open('GET', `http://127.0.0.1:8000/v1/tasks?user_id=${user_id}&status=DONE`, true, );
+        request2.open('GET', `http://185.104.248.207:6079/v1/tasks?user_id=${user_id}&status=DONE`, true, );
         request2.responseType = 'json'
         request2.onload = () => {
             this.setState({
@@ -262,9 +288,10 @@ class TasksPage extends Component {
     }
 
     componentDidMount() {
-        this.updateContentRequest(this.state.user_id)
-
-        let timerID = setInterval(() => this.updateContentRequest(this.state.user_id), 1000);
+        let user_id = this.state.getUser()
+        this.updateContentRequest(user_id)
+        console.log("actual is " + this.state.cookies.user_id)
+        let timerID = setInterval(() => this.updateContentRequest(user_id), 1000);
         this.setState({
             TimerID: timerID
         })
@@ -287,13 +314,15 @@ class TasksPage extends Component {
                 <TaskFoldersComponent
                     addTaskCallback={this.addTaskCallbackFactory()}
                     tasks={this.state.tasks_pending}
-                    user_id={this.state.user_id}/>
+                    user_id={this.state.user_id}
+                    cookes={this.state.cookies}/>
                 <div className="tasks-status-group-tittle">
                     Завершённые
                 </div>
                 <TaskFoldersComponent
                     tasks={this.state.tasks_done}
-                    user_id={this.state.user_id}/>
+                    user_id={this.state.user_id}
+                    cookes={this.state.cookies}/>
             </div>
         )
     }
@@ -307,6 +336,97 @@ function MainPage(props) {
     )
 }
 
+
+function RegistrationPage(props) {
+
+    const [email, set_email] = useState(0);
+    const [first_name, set_first_name] = useState(0);
+    const [second_name, set_second_name] = useState(0);
+    const [patronymic, set_patronymic] = useState(0);
+    const [password, set_password] = useState(0);
+
+    const [cookies, setCookie] = useCookies(['user_id'])
+
+    const onSubmit = () => {
+        const request1 = new XMLHttpRequest();
+        request1.open('POST', `http://185.104.248.207:6079/v1/users`, true, );
+        request1.responseType = 'json'
+        request1.onload = () => {
+            let user_id = request1.response.id;
+            props.changeUser(user_id);
+            props.changePageFactory(Page.MAIN)()
+        }
+        const blob = new Blob([JSON.stringify({
+            email: email,
+            first_name: first_name,
+            second_name: second_name,
+            patronymic: patronymic,
+            password: password,
+            role: "client"
+        }, null, 2)], {
+            type: "application/json",
+        });
+        request1.send(
+            blob
+        );
+
+
+        props.callbackUndo();
+    }
+
+    return (
+        <div className="main">
+            <div className="reg"><h1>SimplePlanner вас приветствует!</h1></div>
+            <br/>
+            <div className="reg"><h2>Зарегистрируйтесь</h2></div>
+            <span className="Url" onClick={props.changePageFactory(Page.LOG_IN)}>У вас уже есть аккаунт?</span>
+            <div>
+                <input type="text" name="first_name" size="40" maxLength="16" required placeholder="Введите фамилию" onChange={(e) => set_first_name(e.target.value)}/>
+                <div className="RegBlock"><input type="text" name="second_name" size="40" maxLength="16" required
+                                                 placeholder="Введите имя" onChange={(e) => set_first_name(e.target.value)}/></div>
+                <div className="RegBlock"><input type="text" name="patronymic" size="40" maxLength="16" required
+                                                 placeholder="Введите отчество" onChange={(e) => set_patronymic(e.target.value)}/></div>
+                <div className="RegBlock"><input type="text" name="email" size="40" maxLength="16" required
+                                                 placeholder="Введите email" onChange={(e) => set_email(e.target.value)}/></div>
+                <div className="RegBlock"><input type="text" name="password" size="40" maxLength="16" required
+                                                 placeholder="Введите пароль" onChange={(e) => set_password(e.target.value)}/></div>
+                <p className="Url" onClick={props.changePageFactory(Page.FORGOT_PASSWORD)}>Забыли пароль?</p>
+                <div className="RegBlock"><div onClick={onSubmit}>Подтвердить</div></div>
+            </div>
+        </div>
+    )
+}
+
+
+function ForgotPasswordPage(props) {
+    return [
+        <div className="reg"><h1>Восстановление пароля</h1></div>,
+        <form action="http://185.104.248.207:6079/v1/register_user" method="post">
+            <div className="RegBlock"><input type="text" name="email" size="40" maxLength="16" required
+                                             placeholder="Введите email"/></div>
+        </form>,
+        <p className="Url" onClick={props.changePageFactory(Page.MAIN)}>Выслать пароль</p>,
+    ]
+}
+
+
+function LoginPage(props) {
+    return [
+        <div className="reg"><h1>Вход в аккаунт</h1></div>,
+        <form action="http://185.104.248.207:6079/v1/register_user" method="post">
+            <div className="RegBlock">
+                <input type="text" name="email" size="40" maxLength="16" required
+                                              placeholder="Введите email"/>
+            </div>
+            <div className="RegBlock">
+                <input type="text" name="password" size="40" maxLength="16" required
+                                              placeholder="Введите пароль"/>
+            </div>
+            <p className="Url" onClick={props.changePageFactory(Page.FORGOT_PASSWORD)}>Забыли пароль?</p>
+            <div className="RegBlock"><input type="submit"/></div>
+        </form>
+    ]
+}
 
 function ProjectsPage(props) {
     return (
@@ -323,7 +443,7 @@ function App() {
 
     return (
     <div className="App">
-        <PageControllerComponent user_id={cookies.user_id}/>
+        <PageControllerComponent user_id={cookies.user_id} cookies={cookies}/>
     </div>
   );
 }
