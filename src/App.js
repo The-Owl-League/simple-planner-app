@@ -70,6 +70,7 @@ class PageControllerComponent extends Component {
                     return <AddTaskPage
                         user_id={this.state.user_id}
                         callbackUndo={callbackUndo}
+                        getUser={this.getUser}
                     />
                 case Page.REGISTRATION:
                     console.log('ok')
@@ -131,7 +132,7 @@ function AddTaskPage(props) {
 
     const onSubmit = (e) => {
         const request1 = new XMLHttpRequest();
-        request1.open('POST', `http://185.104.248.207:6079/v1/tasks/?user_id=${props.user_id}`, true, );
+        request1.open('POST', `http://185.104.248.207:6079/v1/tasks/?user_id=${props.getUser()}`, true, );
         request1.responseType = 'json'
         request1.onload = () => {}
         const blob = new Blob([JSON.stringify({
