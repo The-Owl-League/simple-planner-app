@@ -157,7 +157,7 @@ function AddTaskPage(props) {
             <form className="form-fields-container">
                 <input
                     type="text" name="title" size="40"
-                    maxLength="30" required placeholder="Введите название"
+                    maxLength="50" required placeholder="Введите название"
                     onChange={(e) => setTitle(e.target.value)}
                 />
                 <textarea
@@ -166,7 +166,7 @@ function AddTaskPage(props) {
                 />
                 <input
                     type="text" name="deadline" size="40"
-                    maxLength="30" required placeholder="Введите дедлайн"
+                    maxLength="50" required placeholder="Введите дедлайн"
                     onChange={(e) => setDeadline(e.target.value)}
                 />
                 <input type="submit" placeholder="Подтвердить"></input>
@@ -381,14 +381,14 @@ function RegistrationPage(props) {
             <div className="reg"><h2>Зарегистрируйтесь</h2></div>
             <span className="Url" onClick={props.changePageFactory(Page.LOG_IN)}>У вас уже есть аккаунт?</span>
             <div>
-                <input type="text" name="first_name" size="40" maxLength="16" required placeholder="Введите фамилию" onChange={(e) => set_first_name(e.target.value)}/>
-                <div className="RegBlock"><input type="text" name="second_name" size="40" maxLength="16" required
+                <input type="text" name="first_name" size="40" maxLength="50" required placeholder="Введите фамилию" onChange={(e) => set_first_name(e.target.value)}/>
+                <div className="RegBlock"><input type="text" name="second_name" size="40" maxLength="50" required
                                                  placeholder="Введите имя" onChange={(e) => set_first_name(e.target.value)}/></div>
-                <div className="RegBlock"><input type="text" name="patronymic" size="40" maxLength="16" required
+                <div className="RegBlock"><input type="text" name="patronymic" size="40" maxLength="50" required
                                                  placeholder="Введите отчество" onChange={(e) => set_patronymic(e.target.value)}/></div>
-                <div className="RegBlock"><input type="text" name="email" size="40" maxLength="16" required
+                <div className="RegBlock"><input type="text" name="email" size="40" maxLength="50" required
                                                  placeholder="Введите email" onChange={(e) => set_email(e.target.value)}/></div>
-                <div className="RegBlock"><input type="text" name="password" size="40" maxLength="16" required
+                <div className="RegBlock"><input type="text" name="password" size="40" maxLength="50" required
                                                  placeholder="Введите пароль" onChange={(e) => set_password(e.target.value)}/></div>
                 <p className="Url" onClick={props.changePageFactory(Page.FORGOT_PASSWORD)}>Забыли пароль?</p>
                 <div className="RegBlock"><div onClick={onSubmit}>Подтвердить</div></div>
@@ -402,7 +402,7 @@ function ForgotPasswordPage(props) {
     return [
         <div className="reg"><h1>Восстановление пароля</h1></div>,
         <form action="http://185.104.248.207:6079/v1/register_user" method="post">
-            <div className="RegBlock"><input type="text" name="email" size="40" maxLength="16" required
+            <div className="RegBlock"><input type="text" name="email" size="40" maxLength="50" required
                                              placeholder="Введите email"/></div>
         </form>,
         <p className="Url" onClick={props.changePageFactory(Page.MAIN)}>Выслать пароль</p>,
@@ -415,11 +415,11 @@ function LoginPage(props) {
         <div className="reg"><h1>Вход в аккаунт</h1></div>,
         <form action="http://185.104.248.207:6079/v1/register_user" method="post">
             <div className="RegBlock">
-                <input type="text" name="email" size="40" maxLength="16" required
+                <input type="text" name="email" size="40" maxLength="50" required
                                               placeholder="Введите email"/>
             </div>
             <div className="RegBlock">
-                <input type="text" name="password" size="40" maxLength="16" required
+                <input type="text" name="password" size="40" maxLength="50" required
                                               placeholder="Введите пароль"/>
             </div>
             <p className="Url" onClick={props.changePageFactory(Page.FORGOT_PASSWORD)}>Забыли пароль?</p>
